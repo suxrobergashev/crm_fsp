@@ -64,6 +64,31 @@ class Lead(BaseModel):
         ordering = ('created_at',)
 
 
+
+class Comment(BaseModel):
+    admin = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='user_comment',
+                              verbose_name='Администратор')
+    lead = models.ForeignKey(Lead, on_delete=models.SET_NULL, null=True, related_name='lead_comment',
+                             verbose_name='Лид')
+
+    comment = models.TextField(verbose_name='Коментарий')
+    lead_status = models.CharField(max_length=100, blank=True, null=True, verbose_name='Лид статус')
+
+    def save(self, *args, **kwargs):
+        if not self.lead_status:
+            self.lead_status = self.lead.status
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.lead}"
+
+    class Meta:
+        verbose_name = "Коментарий"
+        verbose_name_plural = 'Коментарии'
+        ordering = ('created_at',)
+
+
+
 class State(BaseModel):
     name = models.CharField(max_length=150, verbose_name="Название Государства")
 
